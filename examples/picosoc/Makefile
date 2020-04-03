@@ -16,7 +16,7 @@ hardware.json: hardware.v spimemio.v simpleuart.v picosoc.v picorv32.v
 	yosys -ql hardware.log -p 'synth_ice40 -top hardware -json hardware.json' $^
 
 %.asc: $(PIN_DEF) %.json
-	nextpnr-ice40 --$(DEVICE) --freq $(CLK_MHZ) --opt-timing --package $(PACKAGE) --pcf $(PIN_DEF) --json $*.json --asc $@
+	nextpnr-ice40 -l nextpnr.log --$(DEVICE) --freq $(CLK_MHZ) --opt-timing --package $(PACKAGE) --pcf $(PIN_DEF) --json $*.json --asc $@
 
 hardware.bin: hardware.asc
 	icetime -d hx8k -c 12 -mtr hardware.rpt hardware.asc
