@@ -22,8 +22,8 @@ module hardware (
 
     // onboard USB interface
     output pin_pu,
-    output pin_usbp,
-    output pin_usbn,
+    inout  pin_usbp,
+    inout  pin_usbn,
 
     // hardware UART
     output pin_1,
@@ -41,23 +41,67 @@ module hardware (
     inout  flash_io3
 );
     assign pin_pu = 1'b1;
-    assign pin_usbp = 1'b0;
-    assign pin_usbn = 1'b0;
 
     wire clk = clk_16mhz;
   
+
+    ///////////////////////////////////
+    // USB interface
+    ///////////////////////////////////
+    wire clk_48mhz;
+
+    wire clk_locked;
+
+    // Use an icepll generated pll
+    pll pll48( .clock_in(clk_16mhz), .clock_out(clk_48mhz), .locked( clk_locked ) );
+
+    // uart pipeline in
+    wire [7:0] uart_in_data;
+    wire       uart_in_valid;
+    wire       uart_in_ready;
+
+    // uart pipeline out
+    wire [7:0] uart_out_data;
+    wire       uart_out_valid;
+    wire       uart_out_ready;
+
+    assign uart_in_data  = uart_out_data ^ 8'b01;
+    assign uart_in_valid = uart_out_valid;
+    assign uart_out_ready = uart_in_ready;
+
+    // usb uart - this instanciates the entire USB device.
+    usb_uart uart (
+        .clk_48mhz  (clk_48mhz),
+        .reset      (reset),
+
+        // pins
+        .pin_usb_p( pin_usbp ),
+        .pin_usb_n( pin_usbn ),
+
+        // uart pipeline in
+        .uart_in_data( uart_in_data ),
+        .uart_in_valid( uart_in_valid ),
+        .uart_in_ready( uart_in_ready ),
+
+        .uart_out_data( uart_out_data ),
+        .uart_out_valid( uart_out_valid ),
+        .uart_out_ready( uart_out_ready  )
+
+        //.debug( debug )
+    );
 
     ///////////////////////////////////
     // Power-on Reset
     ///////////////////////////////////
     reg [5:0] reset_cnt = 0;
     wire resetn = &reset_cnt;
+    wire reset = ~resetn;
 
     always @(posedge clk) begin
-        reset_cnt <= reset_cnt + !resetn;
+        if (clk_locked)
+            reset_cnt <= reset_cnt + !resetn;
     end
 
-  
     ///////////////////////////////////
     // SPI Flash Interface
     ///////////////////////////////////

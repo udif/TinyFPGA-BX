@@ -1,0 +1,3 @@
+[submodule "examples/picosoc/tinyfpga_bx_usbserial"]
+	path = examples/picosoc/tinyfpga_bx_usbserial
+	url = https://github.com/davidthings/tinyfpga_bx_usbserial.git
