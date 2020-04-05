@@ -1,5 +1,5 @@
- read_verilog -sv hardware.v spimemio.v simpleuart.v picosoc.v picorv32.v tinyfpga_bx_usbserial/usb/edge_detect.v \
-	tinyfpga_bx_usbserial/usb/serial.v \
+read_verilog -sv tinyfpga_bx_usbserial/usb/edge_detect.v \
+ 	tinyfpga_bx_usbserial/usb/serial.v \
 	tinyfpga_bx_usbserial/usb/usb_fs_in_arb.v \
 	tinyfpga_bx_usbserial/usb/usb_fs_in_pe.v \
 	tinyfpga_bx_usbserial/usb/usb_fs_out_arb.v \
@@ -12,6 +12,7 @@
 	tinyfpga_bx_usbserial/usb/usb_serial_ctrl_ep.v \
 	tinyfpga_bx_usbserial/usb/usb_uart_bridge_ep.v \
 	tinyfpga_bx_usbserial/usb/usb_uart_core.v \
-	tinyfpga_bx_usbserial/usb/usb_uart_i40.v \
- 	pll.v
+	tinyfpga_bx_usbserial/usb/usb_uart_i40.v
+synth_ice40 -device lp -relut -top usb_uart -json usb_uart.json
+read_verilog -sv hardware.v spimemio.v simpleuart.v picosoc.v picorv32.v pll.v
 synth_ice40 -device lp -relut -top hardware -json hardware.json
