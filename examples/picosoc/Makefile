@@ -42,7 +42,7 @@ upload: $(PROJTOP).bin firmware.bin
 
 
 $(PROJTOP).json: $(PROJTOP).v spimemio.v simpleuart.v picosoc.v picorv32.v $(USB_SOURCES)
-	yosys -ql $(PROJTOP).log -p 'synth_ice40 -top $(PROJTOP) -json $(PROJTOP).json' $^
+	yosys -ql $(PROJTOP).log -s synth_ice40.scr
 
 %.asc: $(PIN_DEF) %.json usb_clk.py
 	nextpnr-ice40 -l nextpnr.log --$(DEVICE) --placer-budgets --freq $(CLK_MHZ) --opt-timing --pre-pack usb_clk.py --package $(PACKAGE) --pcf $(PIN_DEF) --json $*.json --asc $@
